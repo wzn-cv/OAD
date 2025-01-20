@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="description" content="4D Gaussian Splatting for Real-Time Dynamic Scene Rendering">
+    <meta name="keywords" content="Gaussians, Dynamic, Rendering, Splatting">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>4D Gaussian Splatting for Real-Time Dynamic Scene Rendering</title>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYVRSFMDRL"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-PYVRSFMDRL');
+    </script>
+
+    <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+
+    <link rel="stylesheet" href="./static/css/bulma.min.css">
+    <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+    <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+    <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+    <link rel="stylesheet" href="./static/css/index.css">
+    <link rel="icon" href="./static/images/hust.png">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script defer src="./static/js/fontawesome.all.min.js"></script>
+    <script src="./static/js/bulma-carousel.min.js"></script>
+    <script src="./static/js/bulma-slider.min.js"></script>
+    <script src="./static/js/index.js"></script>
+</head>
+
+<body>
+
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
+        </div>
+        <div class="navbar-menu">
+            <div class="navbar-start" style="flex-grow: 1; justify-content: center;">
+                <a class="navbar-item" href="https://guanjunwu.github.io">
+                    <span class="icon">
+          <i class="fas fa-home"></i>
+      </span>
+                </a>
+
+                <div class="navbar-item has-dropdown is-hoverable">
+                    <a class="navbar-link">
+          More Research
+        </a>
+                    <div class="navbar-dropdown">
+
+                        <a class="navbar-item" href="https://jaminfong.cn/neusample/">
+            NeuSample
+          </a>
+                        <a class="navbar-item" href="https://jaminfong.cn/tineuvox/">
+            TiNeuVox
+          </a>
+                        <a class="navbar-item" href="https://taoranyi.com/gneuvox/">
+            GNeuVox
+           </a>
+                        <a class="navbar-item" href="https://jumpat.github.io/SA3D/">
+            Segment Anything in 3D with NeRFs
+          </a>
+                        <a class="navbar-item" href="https://guanjunwu.github.io/HDR-HexPlane/">
+            HDR-HexPlane
+          </a>
+                        <a class="navbar-item" href="https://taoranyi.com/gaussiandreamer/">
+            GaussianDreamer
+          </a>
+        </a>
+        <a class="navbar-item" href="https://taoranyi.com/gaussiandreamerpro/">
+        GaussianDreamerPro
+        </a>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </nav>
+
+
+    <section class="hero">
+        <div class="hero-body">
+            <div class="container is-max-desktop">
+                <div class="columns is-centered">
+                    <div class="column has-text-centered">
+                        <h1 class="title is-1 publication-title">4D Gaussian Splatting for </h1>
+                        <h1 class="title is-1 publication-title">Real-Time Dynamic Scene Rendering</h1>
+                        <h2 class="title is-3">CVPR 2024</h2>
+
+                        <div class="is-size-5 publication-authors">
+                            <span class="author-block">
+              <a href="https://guanjunwu.github.io">Guanjun Wu</a><sup>1*</sup>,</span>
+                            <span class="author-block">
+              <a href="https://taoranyi.github.io">Taoran Yi</a><sup>1*</sup>,</span>
+                            <span class="author-block">
+              <a href="https://jaminfong.cn">Jiemin Fang</a><sup>2‡</sup>,
+            </span>
+
+
+                            <span class="author-block">
+              <a href="http://lingxixie.com/">Lingxi Xie</a><sup>2</sup>,
+            </span>
+                            <span class="author-block">
+              <a href="https://scholar.google.com/citations?user=Ud6aBAcAAAAJ&hl=zh-CN">Xiaopeng Zhang</a><sup>2</sup>,
+            </span>
+                            <p></p>
+                            <span class="author-block">
+              <a href="https://www.eric-weiwei.com/">Wei Wei</a><sup>1</sup>,
+            </span>
+                            <span class="author-block">
+              <a href="http://eic.hust.edu.cn/professor/liuwenyu/">Wenyu Liu</a><sup>1</sup>,
+            </span>
+                            <span class="author-block">
+              <a href="https://www.qitian1987.com/">Qi Tian</a><sup>2</sup>,
+            </span>
+                            <span class="author-block">
+              <a href="https://xwcv.github.io/">Xinggang Wang</a><sup>1‡✉</sup>
+            </span>
+                        </div>
+
+                        <div class="is-size-5 publication-authors">
+                            <span class="author-block"><sup>1</sup>Huazhong University of Science and Technology</span>
+                            <span class="author-block"><sup>2</sup>Huawei Inc.</span>
+                            <p></p>
+                            <span class="author-block"><sup>*</sup>Equal Contributions.</span>
+                            <span class="author-block"><sup>‡</sup>Project Lead.</span>
+
+                            <span class="author-block"><sup>✉</sup>Corresponding Authors.</span>
+
+                        </div>
+                        <div class="column has-text-centered">
+                            <div class="publication-links">
+                                <!-- PDF Link. -->
+                                <span class="link-block">
+                <a href="https://arxiv.org/pdf/2310.08528v2.pdf"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fas fa-file-pdf"></i>
+                  </span>
+                                <span>Paper</span>
+                                </a>
+                                </span>
+                                <span class="link-block">
+                <a href="https://arxiv.org/abs/2310.08528"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="ai ai-arxiv"></i>
+                  </span>
+                                <span>arXiv</span>
+                                </a>
+                                </span>
+                                <!-- Video Link. -->
+                                <!-- <span class="link-block">
+                <a href="https://www.youtube.com/watch?v=MrKrnHhk8IA"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-youtube"></i>
+                  </span>
+                  <span>Video</span>
+                </a>
+              </span> -->
+                                <!-- Code Link. -->
+                                <span class="link-block">
+                <a href="https://github.com/hustvl/4DGaussians"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                                <span>Code</span>
+                                </a>
+                                </span>
+                                <!-- Dataset Link. -->
+                                <!-- <span class="link-block">
+                <a href="https://github.com/google/nerfies/releases/tag/0.1"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="far fa-images"></i>
+                  </span>
+                  <span>Data</span>
+                  </a> -->
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="container is-max-desktop">
+        <div class="columns is-centered">
+            <!-- <p>
+      As a byproduct of our method, we can also solve the matting problem by ignoring
+      samples that fall outside of a bounding box during rendering.
+    </p> -->
+            <!-- Visual Effects. -->
+            <div class="column">
+                <div class="content">
+                    <!-- <h2 class="title is-3">Visual Effects</h2> -->
+
+                    <video id="dollyzoom" autoplay controls muted loop playsinline height="100%">
+          <source src="./static/videos/teaser_chicken.mp4"
+                  type="video/mp4">
+        </video>
+                </div>
+            </div>
+            <div class="column">
+                <div class="columns is-centered">
+                    <div class="column content">
+
+                        <video id="matting-video" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/teaser_beef.mp4"
+                    type="video/mp4">
+          </video>
+                    </div>
+
+                </div>
+            </div>
+            <div class="column">
+                <div class="columns is-centered">
+                    <div class="column content">
+
+                        <video id="matting-video" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/teaser_cookie.mp4"
+                    type="video/mp4">
+          </video>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <h2 class="subtitle has-text-centered">
+        <span class="dnerf">4D-GS</span> can learn a high-resolution real dynamic scene within 30 minutes and achieve 30+ fps real-time rendering on one RTX 3090 GPU.
+    </h2>
+    <div class="columns is-centered">
+        <iframe width="1120" height="630" src="https://www.youtube.com/embed/_wRbq8KnaVg?si=MCX2CZMGOgRyjKSL" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen></iframe>
+
+    </div>
+
+    <section class="section">
+        <div class="container is-max-desktop">
+            <div class="columns is-centered has-text-centered">
+                <div class="column is-four-fifths">
+                    <h2 class="title is-3">Abstract</h2>
+                    <div class="content has-text-justified">
+                        <p>
+                            Representing and rendering dynamic scenes has been an important but challenging task. Especially, to accurately model complex motions, high efficiency is usually hard to guarantee. To achieve real-time dynamic scene rendering while also enjoying high
+                            training and storage efficiency, we propose 4D Gaussian Splatting (4D-GS) as a holistic representation for dynamic scenes rather than applying 3D-GS for each individual frame. In 4D-GS, a novel explicit representation containing
+                            both 3D Gaussians and 4D neural voxels is proposed. A decomposed neural voxel encoding algorithm inspired by HexPlane is proposed to efficiently build Gaussian features from 4D neural voxels and then a lightweight MLP is applied
+                            to predict Gaussian deformations at novel timestamps. Our 4D-GS method achieves real-time rendering under high resolutions, 82 FPS at an 800 X 800 resolution on an RTX 3090 GPU while maintaining comparable or better quality
+                            than previous state-of-the-art methods.
+                    </div>
+                </div>
+
+            </div>
+
+            <img src="./static/images/teaserfig1.svg" class="interpolation-image" alt="Interpolation end reference image." />
+            <p>
+                Our method achieves real-time rendering for dynamic scenes at high image resolutions while maintaining high rendering quality. The right figure is mainly tested on synthetic datasets, where the radius of the dot corresponds to the training time. "Res":
+                resolution.
+            </p>
+            <img src="./static/images/pipeline_00.jpg" class="interpolation-image" alt="Interpolation end reference image." />
+            <p>
+                The overall pipeline of our model. Given a group of 3D Gaussians S, we extract the center of each 3D Gaussian X and timestamp t to compute the features by a spatial-temporal structure encoder. Then a multi-head Gaussian deformation decoder is used to
+                decode the feature and get S` of each Gaussian at timestamp t. </p>
+            <!--/ Abstract. -->
+
+
+        </div>
+    </section>
+
+
+
+    <section class="hero is-light is-small">
+        <div class="hero-body">
+
+
+            <div class="container">
+                <h2 class="title is-3">Training Process</h2>
+                <div id="results-carousel" class="carousel results-carousel">
+                    <div class="item item-toby">
+                        <video id="teaser" autoplay muted loop playsinline height="100%">
+            <source src="./static/videos/cut_roasted_beef_time.mp4"
+                    type="video/mp4">
+          </video>
+                    </div>
+                    <div class="item item-toby">
+                        <video id="teaser" autoplay muted loop playsinline height="100%">
+            <source src="./static/videos/cookie_time.mp4"
+                    type="video/mp4">
+          </video>
+                    </div>
+                    <div class="item item-steve">
+                        <video poster="" id="steve" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/lego_time.mp4"
+                    type="video/mp4">
+          </video>
+                    </div>
+
+                    <div class="item item-shiba">
+                        <video poster="" id="shiba" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/standup_time.mp4"
+                    type="video/mp4">
+          </video>
+                    </div>
+                    <div class="item item-fullbody">
+                        <video poster="" id="fullbody" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/jumpingjack_time.mp4"
+                    type="video/mp4">
+          </video>
+                    </div>
+
+                    <div class="item item-toby">
+                        <video poster="" id="toby" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/bouncingball_time.mp4"
+                    type="video/mp4">
+          </video>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+
+
+
+
+    <section class="section">
+
+        <section class="hero is-light is-small">
+
+
+            <div class="hero-body">
+                <div class="container is-max-desktop">
+                    <h2 class="title is-3">D-NeRF Datasets</h2>
+                    <div id="results-carousel" class="carousel results-carousel">
+
+                        <div class="item item-chair-tp">
+                            <video poster="" id="chair-tp" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/mutant.mp4"
+                    type="video/mp4">
+          </video>
+                        </div>
+
+                        <div class="item item-blueshirt">
+                            <video poster="" id="blueshirt" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/trex.mp4"
+                    type="video/mp4">
+          </video>
+                        </div>
+
+                        <div class="item item-coffee">
+                            <video poster="" id="coffee" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/hellwarrior.mp4"
+                    type="video/mp4">
+          </video>
+                        </div>
+                        <div class="item item-mask">
+                            <video poster="" id="mask" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/hook.mp4"
+                    type="video/mp4">
+          </video>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="container is-max-desktop">
+
+            <!-- <h2 class="title is-3">HyperNeRF Datasets</h2> -->
+            <section class="hero is-light is-small">
+
+
+                <div class="hero-body">
+                    <div class="container is-max-desktop">
+                        <h2 class="title is-3">HyperNeRF Datasets</h2>
+                        <div id="results-carousel" class="carousel results-carousel">
+
+                            <div class="item item-chair-tp">
+                                <video poster="" id="chair-tp" autoplay controls muted loop playsinline height="100%">
+                <source src="./static/videos/split_cookie.mp4"
+                        type="video/mp4">
+              </video>
+                            </div>
+
+                            <div class="item item-blueshirt">
+                                <video poster="" id="blueshirt" autoplay controls muted loop playsinline height="100%">
+                <source src="./static/videos/interp_chicken.mp4"
+                        type="video/mp4">
+              </video>
+                            </div>
+
+                            <div class="item item-chair-tp">
+                                <video id="matting-video" autoplay controls muted loop playsinline height="100%">
+                <source src="./static/videos/americano.mp4"
+                        type="video/mp4">
+              </video>
+                            </div>
+                            <div class="item item-blueshirt">
+                                <video id="dollyzoom" autoplay controls muted loop playsinline height="100%">
+                <source src="./static/videos/torchocolate.mp4"
+                        type="video/mp4">
+              </video>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <div class="columns is-centered">
+
+                <div class="column">
+                    <div class="columns is-centered">
+                        <div class="column content">
+
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <section class="hero teaser">
+                <h2 class="title is-3">Real-Time Viewer</h2>
+
+                <div class="container is-max-desktop">
+                    <div class="hero-body">
+
+                        <video id="teaser" autoplay muted loop playsinline height="50%">
+            <source src="./static/videos/train_visualize.mp4"
+                    type="video/mp4">
+          </video>
+
+                    </div>
+                </div>
+            </section>
+            <h2 class="title is-3">Fixed-View Rendering</h2>
+
+            <div class="columns is-centered">
+                <!-- <p>
+        As a byproduct of our method, we can also solve the matting problem by ignoring
+        samples that fall outside of a bounding box during rendering.
+      </p> -->
+                <!-- Visual Effects. -->
+                <div class="column">
+                    <div class="content">
+                        <!-- <h2 class="title is-3">Visual Effects</h2> -->
+
+                        <video id="dollyzoom" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/cook_spinach_fix_2_60.mp4"
+                    type="video/mp4">
+          </video>
+                    </div>
+                </div>
+                <!--/ Visual Effects. -->
+
+                <!-- Matting. -->
+                <div class="column">
+                    <div class="columns is-centered">
+                        <div class="column content">
+
+                            <video id="matting-video" autoplay controls muted loop playsinline height="100%">
+              <source src="./static/videos/cut_roasted_beef_fix_2_60.mp4"
+                      type="video/mp4">
+            </video>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <!--/ Matting. -->
+
+            <!-- Animation. -->
+            <h2 class="title is-3">Free-View Rendering</h2>
+
+            <div class="columns is-centered">
+                <!-- <p>
+        As a byproduct of our method, we can also solve the matting problem by ignoring
+        samples that fall outside of a bounding box during rendering.
+      </p> -->
+                <!-- Visual Effects. -->
+                <div class="column">
+                    <div class="content">
+                        <!-- <h2 class="title is-3">Visual Effects</h2> -->
+
+                        <video id="dollyzoom" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/cook_spinach_2_30.mp4"
+                    type="video/mp4">
+          </video>
+                    </div>
+                </div>
+                <!--/ Visual Effects. -->
+
+                <!-- Matting. -->
+                <div class="column">
+                    <div class="columns is-centered">
+                        <div class="column content">
+
+                            <video id="matting-video" autoplay controls muted loop playsinline height="100%">
+              <source src="./static/videos/cut_roasted_beef_2_30.mp4"
+                      type="video/mp4">
+            </video>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="hero-body">
+                <div class="container is-max-desktop">
+                    <h2 class="title is-3">Merging Different 4D Gaussians</h2>
+                    <div id="results-carousel" class="carousel results-carousel">
+
+                        <div class="item item-coffee">
+                            <video poster="" id="coffee" autoplay controls muted loop playsinline height="100%">
+              <source src="./static/videos/editing1.mp4"
+                      type="video/mp4">
+            </video>
+                        </div>
+
+                        <div class="item item-chair-tp">
+                            <video poster="" id="chair-tp" autoplay controls muted loop playsinline height="100%">
+              <source src="./static/videos/editing3.mp4"
+                      type="video/mp4">
+            </video>
+                        </div>
+
+                        <div class="item item-coffee">
+                            <video poster="" id="coffee" autoplay controls muted loop playsinline height="100%">
+              <source src="./static/videos/editing4.mp4"
+                      type="video/mp4">
+            </video>
+                        </div>
+                        <div class="item item-coffee">
+                            <video poster="" id="coffee" autoplay controls muted loop playsinline height="100%">
+              <source src="./static/videos/editing1.mp4"
+                      type="video/mp4">
+            </video>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="hero-body">
+                <div class="container is-max-desktop">
+                <div class="container is-max-desktop content">
+                    <h2 class="title">Acknowledgement</h2>
+                    <p>
+                        We would like to express our sincere gratitude to <a href="https://github.com/zhouzhenghong-gt">Zhenghong Zhou</a> for his revisions to our code and discussions on the content of our paper.
+                    </p>
+                </div>
+                <div class="container is-max-desktop content">
+                    <h2 class="title">Awesome Concurrent/Related Works</h2>
+                    <p>
+                        Welcome to also check out these awesome concurrent/related works, including but not limited to:
+                    </p>
+                    <p>
+                        Novel view synthesis & Tracking:
+                        <a href="https://ingra14m.github.io/Deformable-Gaussians/">Deformable 3D Gaussians</a>,
+                        <a href="https://yihua7.github.io/SC-GS-web/">SC-GS</a>,
+                        <a href="https://md-splatting.github.io/">MD-Splatting</a>.
+
+                    </p>
+                    <p>
+                        AIGC:
+                        <a href="https://vita-group.github.io/4DGen/">4DGen</a>,
+                        <a href="https://github.com/jiawei-ren/dreamgaussian4d">DreamGaussian4D</a>,
+                        <a href="https://github.com/VITA-Group/Diffusion4D">Diffusion4D</a>.
+                    </p>
+                    <p>
+                        AI for science:
+                        <a href="https://github.com/yifliu3/EndoGaussian">EndoGaussian</a>,
+                        <a href="https://github.com/HKU-MedAI/EndoGS">EndoGS</a>,
+                        <a href="https://arxiv.org/abs/2401.16416">Endo-4DGS</a>.
+                    </p>
+
+
+
+                    
+
+                </div>
+                </div>
+            </div>
+            <section class="section" id="BibTeX">
+                <div class="container is-max-desktop content">
+                    <h2 class="title">BibTeX</h2>
+                    <pre><code>@InProceedings{Wu_2024_CVPR,
+                        author    = {Wu, Guanjun and Yi, Taoran and Fang, Jiemin and Xie, Lingxi and Zhang, Xiaopeng and Wei, Wei and Liu, Wenyu and Tian, Qi and Wang, Xinggang},
+                        title     = {4D Gaussian Splatting for Real-Time Dynamic Scene Rendering},
+                        booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+                        month     = {June},
+                        year      = {2024},
+                        pages     = {20310-20320}
+                    }</code></pre>
+                </div>
+            </section>
+            <footer class="footer">
+                <div class="container">
+                    <div class="content has-text-centered">
+                        <a class="icon-link" href="https://arxiv.org/abs/2310.08528">
+                            <i class="fas fa-file-pdf"></i>
+                        </a>
+                        <a class="icon-link" href="https://github.com/guanjunwu" class="external-link" disabled>
+                            <i class="fab fa-github"></i>
+                        </a>
+                    </div>
+                    <div class="columns is-centered">
+                        <div class="column is-8">
+                            <div class="content">
+                                <p>
+                                    This website is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative
+            Commons Attribution-ShareAlike 4.0 International License</a>.
+                                </p>
+                                <p>
+                                    The souce code is borrowed from <a href="https://github.com/hustvl/4DGaussians">nerfies</a>, We thank the authors for sharing the templates.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+
+</body>
+
+</html>
