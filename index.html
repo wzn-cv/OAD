@@ -17,7 +17,11 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 70vh; /* 根据需要调整高度 */
+            width: 100%;
+            max-width: 600px; /* 限制最大宽度 */
+            margin: 20px auto; /* 上下保留 20px 的间距 */
+            padding: 10px; /* 内边距 */
+            box-sizing: border-box; /* 确保 padding 不会增加容器宽度 */
         }
         /* 视频样式 */
         video {
@@ -142,7 +146,7 @@
             </div>
               
             <div class="center-container">
-                <img src="./resources/images/vadplus.jpg" class="interpolation-image" alt="Interpolation end reference image." width="600" height="600" />
+                <img src="./resources/images/vadplus.jpg" class="interpolation-image" alt="Interpolation end reference image." style="max-width: 80%; height: auto;" />
             </div>
         </div>
     </section>
